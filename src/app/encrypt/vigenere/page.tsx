@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function VigenereCipherPage() {
   const [text, setText] = useState("");
@@ -14,37 +14,40 @@ export default function VigenereCipherPage() {
   const cleanInput = (input: string) =>
     input.replace(/[^a-zA-Z]/g, "").toUpperCase();
 
-  const vigenere = (input: string, keyword: string, decrypt = false) => {
-    const cleanedKey = cleanInput(keyword);
-    if (!cleanedKey) return "Greška: ključ ne smije biti prazan.";
+  const vigenere = useCallback(
+    (input: string, keyword: string, decrypt = false) => {
+      const cleanedKey = cleanInput(keyword);
+      if (!cleanedKey) return "Greška: ključ ne smije biti prazan.";
 
-    let output = "";
-    let keyIndex = 0;
+      let output = "";
+      let keyIndex = 0;
 
-    for (let i = 0; i < input.length; i++) {
-      const char = input[i];
-      const isUpper = char >= "A" && char <= "Z";
-      const isLower = char >= "a" && char <= "z";
+      for (let i = 0; i < input.length; i++) {
+        const char = input[i];
+        const isUpper = char >= "A" && char <= "Z";
+        const isLower = char >= "a" && char <= "z";
 
-      if (!isUpper && !isLower) {
-        output += char;
-        continue;
+        if (!isUpper && !isLower) {
+          output += char;
+          continue;
+        }
+
+        const base = isUpper ? 65 : 97;
+        const keyChar = cleanedKey[keyIndex % cleanedKey.length];
+        const keyShift = keyChar.charCodeAt(0) - 65;
+        const shift = decrypt ? 26 - keyShift : keyShift;
+
+        const newChar = String.fromCharCode(
+          ((char.charCodeAt(0) - base + shift) % 26) + base
+        );
+        output += newChar;
+        keyIndex++;
       }
 
-      const base = isUpper ? 65 : 97;
-      const keyChar = cleanedKey[keyIndex % cleanedKey.length];
-      const keyShift = keyChar.charCodeAt(0) - 65;
-      const shift = decrypt ? 26 - keyShift : keyShift;
-
-      const newChar = String.fromCharCode(
-        ((char.charCodeAt(0) - base + shift) % 26) + base
-      );
-      output += newChar;
-      keyIndex++;
-    }
-
-    return output;
-  };
+      return output;
+    },
+    []
+  );
 
   const generateExample = () => {
     const examples = [
@@ -98,7 +101,6 @@ export default function VigenereCipherPage() {
     setResult(output);
     setHistory((prev) => [output, ...prev.slice(0, 4)]);
 
-    // animacija rezultata
     let index = 0;
     setAnimateResult("");
     const interval = setInterval(() => {
@@ -106,7 +108,7 @@ export default function VigenereCipherPage() {
       index++;
       if (index >= output.length) clearInterval(interval);
     }, 30);
-  }, [text, key, mode]);
+  }, [text, key, mode, vigenere]);
 
   return (
     <div className="min-h-screen bg-black text-white p-8 flex flex-col items-center gap-6 font-mono">
@@ -195,9 +197,9 @@ export default function VigenereCipherPage() {
       <div className="bg-gray-800 mt-10 p-4 rounded max-w-md text-sm text-gray-300">
         <h3 className="font-bold text-cyan-400 mb-1">📖 Zanimljivost:</h3>
         Iako ju je dizajnirao Blaise de Vigenère u 16. stoljeću, šifra je postala
-        poznata kao "neslomiva" sve do 19. stoljeća, kada je napokon provaljena.
+        poznata kao &ldquo;neslomiva&rdquo; sve do 19. stoljeća, kada je napokon provaljena.
         U američkom Građanskom ratu koristila se kao vojna komunikacija, a zanimljivo je da
-        je nazivala "le chiffre indéchiffrable" — neprobojna šifra.
+        je nazivana &ldquo;le chiffre indéchiffrable&rdquo; — neprobojna šifra.
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ export default function PlayfairCipherPage() {
     const cleaned = input.toUpperCase().replace(/[^A-Z]/g, "").replace(/J/g, "I");
     let result = "";
     for (let i = 0; i < cleaned.length; i += 2) {
-      let a = cleaned[i];
+      const a = cleaned[i];
       let b = cleaned[i + 1] || "X";
 
       if (a === b) {

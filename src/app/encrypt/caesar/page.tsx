@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function CaesarCipherPage() {
   const [text, setText] = useState("");
@@ -60,9 +59,7 @@ export default function CaesarCipherPage() {
 
   const exportResult = () => {
     const blob = new Blob(
-      [`Original: ${text}
-Pomak: ${shift}
-Rezultat: ${result}`],
+      [`Original: ${text}\nPomak: ${shift}\nRezultat: ${result}`],
       { type: "text/plain" }
     );
     const url = URL.createObjectURL(blob);
@@ -130,30 +127,22 @@ Rezultat: ${result}`],
         >
           {theme === "dark" ? "🌞 Svijetla tema" : "🌙 Tamna tema"}
         </button>
-        <button
-          onClick={exportResult}
-          className="text-cyan-400 hover:underline"
-        >
+        <button onClick={exportResult} className="text-cyan-400 hover:underline">
           📁 Spremi kao .txt
         </button>
       </div>
 
       <div className="w-full max-w-lg flex flex-col gap-8">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-wide text-cyan-400 text-center mb-2">
-            🔐 Cezarova šifra
-          </h1>
-          <p className={`text-center text-base mb-2 ${theme === "dark" ? "text-cyan-200" : "text-gray-700"}`}>
-            Ispod unesite tekst, izaberite smjer i pomak te isprobajte dekripciju ili enkripciju.
-          </p>
-        </div>
+        <h1 className="text-4xl font-bold text-cyan-400 text-center">
+          🔐 Cezarova šifra
+        </h1>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Unesi tekst..."
-          className={`w-full h-28 p-4 rounded mb-3 ${inputBg} resize-none shadow`}
+          className={`w-full h-28 p-4 rounded ${inputBg} resize-none`}
         />
-        <div className="flex flex-wrap justify-center gap-4 mb-4">
+        <div className="flex flex-wrap justify-center gap-4">
           <label className="flex items-center gap-2">
             Pomak:
             <input
@@ -162,56 +151,50 @@ Rezultat: ${result}`],
               max={25}
               value={shift}
               onChange={(e) => setShift(parseInt(e.target.value))}
-              className="w-16 text-center bg-gray-100 rounded p-1 text-gray-900 border border-cyan-300"
+              className="w-16 text-center p-1 rounded"
             />
           </label>
           <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              checked={mode === "encrypt"}
-              onChange={() => setMode("encrypt")}
-            />
+            <input type="radio" checked={mode === "encrypt"} onChange={() => setMode("encrypt")} />
             Enkripcija
           </label>
           <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              checked={mode === "decrypt"}
-              onChange={() => setMode("decrypt")}
-            />
+            <input type="radio" checked={mode === "decrypt"} onChange={() => setMode("decrypt")} />
             Dekripcija
           </label>
         </div>
+
         {result && (
-          <div className={`${cardBg} p-4 rounded-lg w-full relative mb-2`}>
-            <h2 className="mb-2 font-bold text-lg">Rezultat:</h2>
-            <div className="absolute top-2 right-3 flex gap-2 text-xs">
+          <div className={`${cardBg} p-4 rounded w-full`}>
+            <h2 className="font-bold mb-2">Rezultat:</h2>
+            <div className="flex gap-3 text-xs mb-2">
               <button
                 onClick={() => handleCopy(result, "result")}
-                className="text-cyan-500 hover:underline"
+                className="text-cyan-400 hover:underline"
               >
-                {copiedResult ? "Kopirano ✅" : "Kopiraj rezultat"}
+                {copiedResult ? "✅ Kopirano" : "Kopiraj rezultat"}
               </button>
               <button
                 onClick={() => handleCopy(text, "text")}
-                className="text-cyan-500 hover:underline"
+                className="text-cyan-400 hover:underline"
               >
-                {copiedText ? "Kopirano ✅" : "Kopiraj original"}
+                {copiedText ? "✅ Kopirano" : "Kopiraj original"}
               </button>
             </div>
-            <div className="whitespace-pre-wrap break-words">{result}</div>
+            <div>{result}</div>
           </div>
         )}
+
         {mode === "decrypt" && (
           <>
             <button
               onClick={() => setShowBruteforce(!showBruteforce)}
-              className={`text-sm ${btnSecondary}`}
+              className={`${btnSecondary} px-4 py-2 rounded`}
             >
-              {showBruteforce ? "Sakrij bruteforce" : "Pokaži sve moguće dekripcije"}
+              {showBruteforce ? "Sakrij sve pokušaje" : "Pokaži sve moguće dekripcije"}
             </button>
             {showBruteforce && (
-              <div className={`${cardBg} mt-4 p-4 rounded text-sm max-w-lg w-full space-y-1`}>
+              <div className={`${cardBg} p-4 rounded w-full mt-2 text-sm`}>
                 {getBruteforce().map((line, idx) => (
                   <div key={idx}>{line}</div>
                 ))}
@@ -219,49 +202,42 @@ Rezultat: ${result}`],
             )}
           </>
         )}
-        <div className={`${cardBg} mt-4 p-6 rounded-lg`}>
-          <h3 className="text-cyan-400 font-bold mb-2 text-lg">🎯 Pogodi pomak</h3>
-          <button onClick={startGame} className={`${btnMain} mb-3 px-4 py-1 rounded`}>
+
+        <div className={`${cardBg} p-6 rounded-lg w-full`}>
+          <h3 className="font-bold text-cyan-400 mb-2">🎯 Pogodi pomak</h3>
+          <button onClick={startGame} className={`${btnMain} px-4 py-2 rounded mb-2`}>
             Generiraj poruku
           </button>
           {gameText && (
             <>
-              <div className="mb-2">🔐 Poruka: <span className="font-mono">{gameText}</span></div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={gameGuess}
-                  onChange={(e) => setGameGuess(e.target.value)}
-                  min={1}
-                  max={25}
-                  className="bg-gray-100 text-gray-900 px-2 py-1 rounded w-20 border border-cyan-200"
-                  placeholder="Pomak"
-                />
-                <button onClick={checkGuess} className={`${btnMain} px-3 py-1 rounded`}>
-                  Provjeri
-                </button>
-              </div>
+              <div>🔐 Poruka: <span className="font-mono">{gameText}</span></div>
+              <input
+                type="number"
+                value={gameGuess}
+                onChange={(e) => setGameGuess(e.target.value)}
+                className="w-20 mt-2 text-center p-1 rounded text-black"
+              />
+              <button onClick={checkGuess} className={`${btnMain} px-3 py-1 rounded ml-2`}>
+                Provjeri
+              </button>
               <div className="mt-2">{gameFeedback}</div>
             </>
           )}
         </div>
-              <div className="bg-gray-800 mt-10 p-4 rounded max-w-md text-sm text-gray-300">
-        <h3 className="font-bold text-cyan-400 mb-1">🔓 Kako se probija Cezarova šifra?</h3>
-        <ul className="list-disc pl-5 space-y-2">
-          <li>
-            <b>Brute-force napad:</b> isprobaju se svih 25 mogućih pomaka i traži se smisleni tekst.</li>
-          <li>
-            <b>Frekvencijska analiza:</b> analizom učestalosti slova otkriva se najvjerojatniji pomak (npr. slovo 'E' je najčešće u hrvatskom jeziku).</li>
-          <li>
-            <b>Automatizirani alati:</b> danas postoje programi koji u sekundi mogu proći kroz sve mogućnosti i otkriti originalnu poruku.</li>
-        </ul>
-        <div className="mt-3 text-cyan-300 italic">
-          Zbog malog broja mogućih ključeva i predvidive strukture jezika, Cezarova šifra nije sigurna za stvarnu zaštitu podataka.
+
+        <div className="bg-gray-800 p-4 rounded text-sm text-gray-300 mt-4">
+          <h3 className="font-bold text-cyan-400 mb-1">🔓 Kako se probija Cezarova šifra?</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><b>Brute-force napad:</b> isprobaju se svih 25 mogućih pomaka i traži se smisleni tekst.</li>
+            <li><b>Frekvencijska analiza:</b> slovo "E" ili "A" često ukazuje na pomak.</li>
+            <li><b>Automatizirani alati:</b> lako razbijaju šifru i prikazuju sve verzije.</li>
+          </ul>
+          <p className="mt-2 italic text-cyan-300">
+            Cezarova šifra je jednostavna i pogodna za edukaciju, ali nesigurna u praksi.
+          </p>
         </div>
       </div>
 
-
-      </div>
       <footer className="mt-10 text-sm text-gray-400 text-center">
         Izrađeno za FER – Seminar 2 (2025)
       </footer>
